@@ -4,15 +4,16 @@ import 'package:flutter/material.dart' hide Image;
 
 import 'controller.dart';
 
-///Handles all the painting ongoing on the canvas.
+/// Handles all the painting ongoing on the canvas.
 class DrawImage extends CustomPainter {
-  ///The background for signature painting.
+  /// The background for signature painting.
   final Color? backgroundColor;
+  final List<Path> _drawnPaths = []; // Saklanan çizim yolları
 
-  //Controller is a listenable with all of the paint details.
+  // Controller is a listenable with all of the paint details.
   late ImagePainterController _controller;
 
-  ///Constructor for the canvas
+  /// Constructor for the canvas
   DrawImage({
     required ImagePainterController controller,
     this.backgroundColor,
@@ -22,7 +23,7 @@ class DrawImage extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    ///paints [ui.Image] on the canvas for reference to draw over it.
+    /// Paints [ui.Image] on the canvas for reference to draw over it.
     paintImage(
       canvas: canvas,
       image: _controller.image!,
@@ -33,19 +34,26 @@ class DrawImage extends CustomPainter {
       ),
     );
 
-    ///paints all the previoud paintInfo history recorded on [PaintHistory]
+    _drawnPaths.clear();
+
+    /// Paints all the previous paintInfo history recorded on [PaintHistory]
     for (final item in _controller.paintHistory) {
       final _offset = item.offsets;
       final _painter = item.paint;
+      Path path = Path(); // Başlatma
+
       switch (item.mode) {
         case PaintMode.rect:
-          canvas.drawRect(Rect.fromPoints(_offset[0]!, _offset[1]!), _painter);
+          path.addRect(Rect.fromPoints(_offset[0]!, _offset[1]!));
+          canvas.drawPath(path, _painter);
           break;
         case PaintMode.line:
-          canvas.drawLine(_offset[0]!, _offset[1]!, _painter);
+          path
+            ..moveTo(_offset[0]!.dx, _offset[0]!.dy)
+            ..lineTo(_offset[1]!.dx, _offset[1]!.dy);
+          canvas.drawPath(path, _painter);
           break;
         case PaintMode.circle:
-          final path = Path();
           path.addOval(
             Rect.fromCircle(
                 center: _offset[1]!,
@@ -54,10 +62,14 @@ class DrawImage extends CustomPainter {
           canvas.drawPath(path, _painter);
           break;
         case PaintMode.arrow:
+          path
+            ..moveTo(_offset[0]!.dx, _offset[0]!.dy)
+            ..lineTo(_offset[1]!.dx, _offset[1]!.dy);
+          canvas.drawPath(path, _painter);
           drawArrow(canvas, _offset[0]!, _offset[1]!, _painter);
           break;
         case PaintMode.dashLine:
-          final path = Path()
+          path
             ..moveTo(_offset[0]!.dx, _offset[0]!.dy)
             ..lineTo(_offset[1]!.dx, _offset[1]!.dy);
           canvas.drawPath(_dashPath(path, _painter.strokeWidth), _painter);
@@ -65,15 +77,14 @@ class DrawImage extends CustomPainter {
         case PaintMode.freeStyle:
           for (int i = 0; i < _offset.length - 1; i++) {
             if (_offset[i] != null && _offset[i + 1] != null) {
-              final _path = Path()
+              path
                 ..moveTo(_offset[i]!.dx, _offset[i]!.dy)
                 ..lineTo(_offset[i + 1]!.dx, _offset[i + 1]!.dy);
-              canvas.drawPath(_path, _painter..strokeCap = StrokeCap.round);
             } else if (_offset[i] != null && _offset[i + 1] == null) {
-              canvas.drawPoints(PointMode.points, [_offset[i]!],
-                  _painter..strokeCap = StrokeCap.round);
+              path.addOval(Rect.fromCircle(center: _offset[i]!, radius: 1.0));
             }
           }
+          canvas.drawPath(path, _painter..strokeCap = StrokeCap.round);
           break;
         case PaintMode.text:
           final textSpan = TextSpan(
@@ -98,59 +109,70 @@ class DrawImage extends CustomPainter {
           textPainter.paint(canvas, textOffset);
           break;
         default:
+          break;
       }
+
+      _drawnPaths.add(path); // Çizilmiş yolu sakla
     }
 
-    ///Draws ongoing action on the canvas while indrag.
+    /// Draws ongoing action on the canvas while in drag.
     if (_controller.busy) {
       final _start = _controller.start;
       final _end = _controller.end;
       final _paint = _controller.brush;
+      Path path = Path(); // Başlatma
+
       switch (_controller.mode) {
         case PaintMode.rect:
-          canvas.drawRect(Rect.fromPoints(_start!, _end!), _paint);
+          path.addRect(Rect.fromPoints(_start!, _end!));
+          canvas.drawPath(path, _paint);
           break;
         case PaintMode.line:
-          canvas.drawLine(_start!, _end!, _paint);
+          path
+            ..moveTo(_start!.dx, _start.dy)
+            ..lineTo(_end!.dx, _end!.dy);
+          canvas.drawPath(path, _paint);
           break;
         case PaintMode.circle:
-          final path = Path();
           path.addOval(Rect.fromCircle(
               center: _end!, radius: (_end - _start!).distance));
           canvas.drawPath(path, _paint);
           break;
         case PaintMode.arrow:
+          path
+            ..moveTo(_start!.dx, _start.dy)
+            ..lineTo(_end!.dx, _end!.dy);
+          canvas.drawPath(path, _paint);
           drawArrow(canvas, _start!, _end!, _paint);
           break;
         case PaintMode.dashLine:
-          final path = Path()
+          path
             ..moveTo(_start!.dx, _start.dy)
-            ..lineTo(_end!.dx, _end.dy);
+            ..lineTo(_end!.dx, _end!.dy);
           canvas.drawPath(_dashPath(path, _paint.strokeWidth), _paint);
           break;
         case PaintMode.freeStyle:
           final points = _controller.offsets;
-          for (int i = 0; i < _controller.offsets.length - 1; i++) {
+          for (int i = 0; i < points.length - 1; i++) {
             if (points[i] != null && points[i + 1] != null) {
-              canvas.drawLine(
-                  Offset(points[i]!.dx, points[i]!.dy),
-                  Offset(points[i + 1]!.dx, points[i + 1]!.dy),
-                  _paint..strokeCap = StrokeCap.round);
+              path
+                ..moveTo(points[i]!.dx, points[i]!.dy)
+                ..lineTo(points[i + 1]!.dx, points[i + 1]!.dy);
             } else if (points[i] != null && points[i + 1] == null) {
-              canvas.drawPoints(PointMode.points,
-                  [Offset(points[i]!.dx, points[i]!.dy)], _paint);
+              path.addOval(Rect.fromCircle(center: points[i]!, radius: 1.0));
             }
           }
+          canvas.drawPath(path, _paint..strokeCap = StrokeCap.round);
           break;
         default:
+          break;
       }
+      _drawnPaths.add(path); // Yeni çizimi sakla
     }
-
-    ///Draws all the completed actions of painting on the canvas.
   }
 
-  ///Draws line as well as the arrowhead on top of it.
-  ///Uses [strokeWidth] of the painter for sizing.
+  /// Draws line as well as the arrowhead on top of it.
+  /// Uses [strokeWidth] of the painter for sizing.
   void drawArrow(Canvas canvas, Offset start, Offset end, Paint painter) {
     final arrowPainter = Paint()
       ..color = painter.color
@@ -169,8 +191,8 @@ class DrawImage extends CustomPainter {
     canvas.restore();
   }
 
-  ///Draws dashed path.
-  ///It depends on [strokeWidth] for space to line proportion.
+  /// Draws dashed path.
+  /// It depends on [strokeWidth] for space to line proportion.
   Path _dashPath(Path path, double width) {
     final dashPath = Path();
     final dashWidth = 10.0 * width / 5;

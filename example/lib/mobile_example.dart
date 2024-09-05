@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_painter/image_painter.dart';
 import 'package:open_file/open_file.dart';
@@ -13,11 +12,12 @@ class MobileExample extends StatefulWidget {
 }
 
 class _MobileExampleState extends State<MobileExample> {
+  // Sadece beyaz renkte, opaklığı 0.3 olacak şekilde ayarlandı.
   final ImagePainterController _controller = ImagePainterController(
-    color: Colors.green,
-    strokeWidth: 4,
-    mode: PaintMode.line,
-  );
+      color: Colors.white.withOpacity(0.5),
+      strokeWidth: 40,
+      mode: PaintMode.freeStyle,
+      text: 'ssss');
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +31,18 @@ class _MobileExampleState extends State<MobileExample> {
           )
         ],
       ),
+      // Renk seçme işlevi kapatıldı.
       body: ImagePainter.asset(
-        "assets/sample.jpg",
-        controller: _controller,
+        "assets/sample.png",
+        brushIcon: const Icon(Icons.linear_scale_sharp),
+        colorIcon: const SizedBox(),
+        clearAllIcon: Text(
+          'sil',
+        ),
         scalable: true,
-        textDelegate: TextDelegate(),
+
+        controller:
+            _controller, // Eğer yazı eklemeyi de devre dışı bırakmak isterseniz burayı kaldırabilirsiniz.
       ),
     );
   }
