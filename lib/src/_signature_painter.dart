@@ -65,6 +65,8 @@ class SignaturePainter extends CustomPainter {
     }
   }
 
+   
+
   @override
   bool shouldRepaint(SignaturePainter oldDelegate) {
     return oldDelegate._controller != _controller;

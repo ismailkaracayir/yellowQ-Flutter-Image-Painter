@@ -823,103 +823,136 @@ class ImagePainterState extends State<ImagePainter> {
 
   Widget _buildControls() {
     return Container(
-      padding: const EdgeInsets.all(4),
-      color: widget.controlsBackgroundColor ?? Colors.grey[200],
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      color: widget.controlsBackgroundColor ?? Colors.grey[300],
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          AnimatedBuilder(
-            animation: _controller,
-            builder: (_, __) {
-              final icon = paintModes(textDelegate)
-                  .firstWhere((item) => item.mode == _controller.mode)
-                  .icon;
-              return PopupMenuButton(
-                tooltip: textDelegate.changeMode,
-                shape: ContinuousRectangleBorder(
-                  borderRadius: BorderRadius.circular(40),
-                ),
-                surfaceTintColor: Colors.transparent,
-                icon: Icon(icon, color: widget.optionColor ?? Colors.grey[700]),
-                itemBuilder: (_) => [_showOptionsRow()],
-              );
-            },
-          ),
-          AnimatedBuilder(
-            animation: _controller,
-            builder: (_, __) {
-              return PopupMenuButton(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                shape: ContinuousRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                surfaceTintColor: Colors.transparent,
-                tooltip: textDelegate.changeColor,
-                icon: widget.colorIcon ??
-                    Container(
-                      padding: const EdgeInsets.all(2.0),
-                      height: 24,
-                      width: 24,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.grey),
-                        color: _controller.color,
-                      ),
-                    ),
-                itemBuilder: (_) => [_showColorPicker()],
-              );
-            },
-          ),
-          PopupMenuButton(
-            tooltip: textDelegate.changeBrushSize,
-            surfaceTintColor: Colors.transparent,
-            shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+          // AnimatedBuilder(
+          //   animation: _controller,
+          //   builder: (_, __) {
+          //     return PopupMenuButton(
+          //       padding: const EdgeInsets.symmetric(vertical: 10),
+          //       shape: ContinuousRectangleBorder(
+          //         borderRadius: BorderRadius.circular(20),
+          //       ),
+          //       surfaceTintColor: Colors.transparent,
+          //       tooltip: textDelegate.changeColor,
+          //       icon: widget.colorIcon ??
+          //           Container(
+          //             padding: const EdgeInsets.all(2.0),
+          //             height: 24,
+          //             width: 24,
+          //             decoration: BoxDecoration(
+          //               shape: BoxShape.circle,
+          //               border: Border.all(color: Colors.red),
+          //               color: _controller.color,
+          //             ),
+          //           ),
+          //       itemBuilder: (_) => [_showColorPicker()],
+          //     );
+          //   },
+          // ),
+          // PopupMenuButton(
+          //   tooltip: textDelegate.changeBrushSize,
+          //   surfaceTintColor: Colors.transparent,
+          //   shape: ContinuousRectangleBorder(
+          //     borderRadius: BorderRadius.circular(20),
+          //   ),
+          //   icon:
+          //       widget.brushIcon ?? Icon(Icons.brush, color: Colors.grey[700]),
+          //   itemBuilder: (_) => [_showRangeSlider()],
+          // ),
+          // AnimatedBuilder(
+          //   animation: _controller,
+          //   builder: (_, __) {
+          //     if (_controller.canFill()) {
+          //       return Row(
+          //         children: [
+          //           Checkbox(
+          //             value: _controller.shouldFill,
+          //             onChanged: (val) {
+          //               _controller.update(fill: val);
+          //             },
+          //           ),
+          //           Text(
+          //             textDelegate.fill,
+          //             style: Theme.of(context).textTheme.bodyMedium,
+          //           )
+          //         ],
+          //       );
+          //     } else {
+          //       return const SizedBox();
+          //     }
+          //   },
+          // ),
+
+          Container(
+            height: 40,
+            width: 40,
+            color: Colors.grey[200],
+            child: IconButton(
+              tooltip: textDelegate.undo,
+              icon:
+                  widget.undoIcon ?? Icon(Icons.reply, color: Colors.grey[700]),
+              onPressed: () {
+                widget.onUndo?.call();
+                _controller.undo();
+              },
             ),
-            icon:
-                widget.brushIcon ?? Icon(Icons.brush, color: Colors.grey[700]),
-            itemBuilder: (_) => [_showRangeSlider()],
           ),
-          AnimatedBuilder(
-            animation: _controller,
-            builder: (_, __) {
-              if (_controller.canFill()) {
-                return Row(
-                  children: [
-                    Checkbox(
-                      value: _controller.shouldFill,
-                      onChanged: (val) {
-                        _controller.update(fill: val);
-                      },
-                    ),
-                    Text(
-                      textDelegate.fill,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    )
-                  ],
-                );
-              } else {
-                return const SizedBox();
-              }
-            },
+          const SizedBox(
+            width: 10,
           ),
-          const Spacer(),
-          IconButton(
-            tooltip: textDelegate.undo,
-            icon: widget.undoIcon ?? Icon(Icons.reply, color: Colors.grey[700]),
-            onPressed: () {
-              widget.onUndo?.call();
-              _controller.undo();
-            },
+          Container(
+            height: 40,
+            width: 40,
+            color: Colors.grey[200],
+            child: IconButton(
+                tooltip: textDelegate.drawing,
+                onPressed: () {
+                  _controller.setMode(PaintMode.freeStyle);
+                },
+                icon: const Icon(Icons.edit)),
           ),
-          IconButton(
-            tooltip: textDelegate.clearAllProgress,
-            icon: widget.clearAllIcon ??
-                Icon(Icons.clear, color: Colors.grey[700]),
-            onPressed: () {
-              widget.onClear?.call();
-              _controller.clear();
-            },
+          const SizedBox(
+            width: 10,
           ),
+          // AnimatedBuilder(
+          //   animation: _controller,
+          //   builder: (_, __) {
+          //     final icon = paintModes(textDelegate)
+          //         .firstWhere((item) => item.mode == _controller.mode)
+          //         .icon;
+          //     return PopupMenuButton(
+          //       tooltip: textDelegate.changeMode,
+          //       shape: ContinuousRectangleBorder(
+          //         borderRadius: BorderRadius.circular(40),
+          //       ),
+          //       surfaceTintColor: Colors.transparent,
+          //       icon: Icon(icon, color: widget.optionColor ?? Colors.grey[700]),
+          //       itemBuilder: (_) => [_showOptionsRow()],
+          //     );
+          //   },
+          // ),
+          Container(
+            height: 40,
+            width: 40,
+            color: Colors.grey[200],
+            child: IconButton(
+              tooltip: textDelegate.clearAllProgress,
+              icon: widget.clearAllIcon ??
+                  Icon(Icons.clear, color: Colors.grey[700]),
+              onPressed: () {
+                widget.onClear?.call();
+                _controller.clear();
+              },
+            ),
+          ),
+          const SizedBox(
+            width: 20,
+          ),
+          //
         ],
       ),
     );

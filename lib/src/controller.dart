@@ -16,6 +16,7 @@ class ImagePainterController extends ChangeNotifier {
   Rect _rect = Rect.zero;
 
   final List<Offset?> _offsets = [];
+  final List<Offset?> _nonPaintedOffsets = []; // don't tounch
 
   final List<PaintInfo> _paintHistory = [];
 
@@ -47,6 +48,7 @@ class ImagePainterController extends ChangeNotifier {
   List<PaintInfo> get paintHistory => _paintHistory;
 
   List<Offset?> get offsets => _offsets;
+  List<Offset?> get nonPaintedOffsets => _nonPaintedOffsets;
 
   Offset? get start => _start;
 
@@ -124,6 +126,11 @@ class ImagePainterController extends ChangeNotifier {
 
   void addOffsets(Offset? offset) {
     _offsets.add(offset);
+    notifyListeners();
+  }
+
+  void addNonPaintedOffset(Offset? offset) {
+    _nonPaintedOffsets.add(offset);
     notifyListeners();
   }
 
