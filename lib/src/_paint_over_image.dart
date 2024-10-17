@@ -23,7 +23,9 @@ class ImagePainter extends StatefulWidget {
     Key? key,
     required this.controller,
     this.assetPath,
+    this.leadingWidget,
     this.networkUrl,
+    this.title,
     this.byteArray,
     this.file,
     this.height,
@@ -64,6 +66,8 @@ class ImagePainter extends StatefulWidget {
     Widget? brushIcon,
     Widget? undoIcon,
     Widget? clearAllIcon,
+    String? title,
+    Widget? leadingWidget,
     Widget? colorIcon,
     ValueChanged<PaintMode>? onPaintModeChanged,
     ValueChanged<Color>? onColorChanged,
@@ -80,7 +84,9 @@ class ImagePainter extends StatefulWidget {
   }) {
     return ImagePainter._(
       key: key,
+      title: title,
       controller: controller,
+      leadingWidget: leadingWidget,
       networkUrl: url,
       height: height,
       width: width,
@@ -369,6 +375,10 @@ class ImagePainter extends StatefulWidget {
 
   ///Widget for Undo last action on control bar.
   final Widget? undoIcon;
+
+  final Widget? leadingWidget;
+
+  final String? title;
 
   ///Widget for clearing all actions on control bar.
   final Widget? clearAllIcon;
@@ -823,11 +833,68 @@ class ImagePainterState extends State<ImagePainter> {
 
   Widget _buildControls() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
       color: widget.controlsBackgroundColor ?? Colors.grey[300],
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          Row(
+            children: [widget.leadingWidget ?? const SizedBox()],
+          ),
+
+          Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  widget.onClear?.call();
+                  _controller.clear();
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(4)),
+                  padding: const EdgeInsets.all(4),
+                  child: widget.clearAllIcon ??
+                      Icon(Icons.clear, color: Colors.grey[700]),
+                ),
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+              InkWell(
+                onTap: () {
+                  _controller.setMode(PaintMode.freeStyle);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(4)),
+                  padding: const EdgeInsets.all(4),
+                  child: const Icon(Icons.edit),
+                ),
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+              InkWell(
+                onTap: () {
+                  widget.onUndo?.call();
+                  _controller.undo();
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(4)),
+                  padding: const EdgeInsets.all(4),
+                  child: widget.undoIcon ??
+                      Icon(Icons.reply, color: Colors.grey[700]),
+                ),
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+            ],
+          )
           // AnimatedBuilder(
           //   animation: _controller,
           //   builder: (_, __) {
@@ -902,23 +969,6 @@ class ImagePainterState extends State<ImagePainter> {
           //   ),
           // ),
 
-          InkWell(
-            onTap: () {
-              widget.onUndo?.call();
-              _controller.undo();
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(4)),
-              padding: const EdgeInsets.all(4),
-              child:
-                  widget.undoIcon ?? Icon(Icons.reply, color: Colors.grey[700]),
-            ),
-          ),
-          const SizedBox(
-            width: 20,
-          ),
           // Container(
           //   height: 40,
           //   width: 40,
@@ -930,21 +980,7 @@ class ImagePainterState extends State<ImagePainter> {
           //       },
           //       icon: const Icon(Icons.edit)),
           // ),
-          InkWell(
-            onTap: () {
-              _controller.setMode(PaintMode.freeStyle);
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(4)),
-              padding: const EdgeInsets.all(4),
-              child: const Icon(Icons.edit),
-            ),
-          ),
-          const SizedBox(
-            width: 20,
-          ),
+
           // AnimatedBuilder(
           //   animation: _controller,
           //   builder: (_, __) {
@@ -978,23 +1014,6 @@ class ImagePainterState extends State<ImagePainter> {
           //   ),
           // ),
 
-          InkWell(
-            onTap: () {
-              widget.onClear?.call();
-              _controller.clear();
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(4)),
-              padding: const EdgeInsets.all(4),
-              child: widget.clearAllIcon ??
-                  Icon(Icons.clear, color: Colors.grey[700]),
-            ),
-          ),
-          const SizedBox(
-            width: 20,
-          ),
           //
         ],
       ),
