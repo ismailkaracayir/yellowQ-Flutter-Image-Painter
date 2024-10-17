@@ -887,36 +887,63 @@ class ImagePainterState extends State<ImagePainter> {
           //   },
           // ),
 
-          Container(
-            height: 40,
-            width: 40,
-            color: Colors.grey[200],
-            child: IconButton(
-              tooltip: textDelegate.undo,
-              icon:
+          // Container(
+          //   height: 40,
+          //   width: 40,
+          //   color: Colors.grey[200],
+          //   child: IconButton(
+          //     tooltip: textDelegate.undo,
+          //     icon:
+          //         widget.undoIcon ?? Icon(Icons.reply, color: Colors.grey[700]),
+          //     onPressed: () {
+          //       widget.onUndo?.call();
+          //       _controller.undo();
+          //     },
+          //   ),
+          // ),
+
+          InkWell(
+            onTap: () {
+              widget.onUndo?.call();
+              _controller.undo();
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(4)),
+              padding: const EdgeInsets.all(4),
+              child:
                   widget.undoIcon ?? Icon(Icons.reply, color: Colors.grey[700]),
-              onPressed: () {
-                widget.onUndo?.call();
-                _controller.undo();
-              },
             ),
           ),
           const SizedBox(
-            width: 10,
+            width: 20,
           ),
-          Container(
-            height: 40,
-            width: 40,
-            color: Colors.grey[200],
-            child: IconButton(
-                tooltip: textDelegate.drawing,
-                onPressed: () {
-                  _controller.setMode(PaintMode.freeStyle);
-                },
-                icon: const Icon(Icons.edit)),
+          // Container(
+          //   height: 40,
+          //   width: 40,
+          //   color: Colors.grey[200],
+          //   child: IconButton(
+          //       tooltip: textDelegate.drawing,
+          //       onPressed: () {
+          //         _controller.setMode(PaintMode.freeStyle);
+          //       },
+          //       icon: const Icon(Icons.edit)),
+          // ),
+          InkWell(
+            onTap: () {
+              _controller.setMode(PaintMode.freeStyle);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(4)),
+              padding: const EdgeInsets.all(4),
+              child: const Icon(Icons.edit),
+            ),
           ),
           const SizedBox(
-            width: 10,
+            width: 20,
           ),
           // AnimatedBuilder(
           //   animation: _controller,
@@ -935,18 +962,34 @@ class ImagePainterState extends State<ImagePainter> {
           //     );
           //   },
           // ),
-          Container(
-            height: 40,
-            width: 40,
-            color: Colors.grey[200],
-            child: IconButton(
-              tooltip: textDelegate.clearAllProgress,
-              icon: widget.clearAllIcon ??
+
+          // Container(
+          //   height: 30,
+          //   width: 30,
+          //   color: Colors.grey[200],
+          //   child: IconButton(
+          //     tooltip: textDelegate.clearAllProgress,
+          //     icon: widget.clearAllIcon ??
+          //         Icon(Icons.clear, color: Colors.grey[700]),
+          //     onPressed: () {
+          //       widget.onClear?.call();
+          //       _controller.clear();
+          //     },
+          //   ),
+          // ),
+
+          InkWell(
+            onTap: () {
+              widget.onClear?.call();
+              _controller.clear();
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(4)),
+              padding: const EdgeInsets.all(4),
+              child: widget.clearAllIcon ??
                   Icon(Icons.clear, color: Colors.grey[700]),
-              onPressed: () {
-                widget.onClear?.call();
-                _controller.clear();
-              },
             ),
           ),
           const SizedBox(

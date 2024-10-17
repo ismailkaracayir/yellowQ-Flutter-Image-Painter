@@ -32,8 +32,8 @@ class _MobileExampleState extends State<MobileExample> {
         ],
       ),
       // Renk seçme işlevi kapatıldı.
-      body: ImagePainter.asset(
-        "assets/sample.png",
+      body: ImagePainter.network(
+        "https://hippist.s3.eu-central-1.amazonaws.com/ddcbe98d-655f-4f47-8a61-3a86420f60c4.png",
 
         scalable: true,
 
