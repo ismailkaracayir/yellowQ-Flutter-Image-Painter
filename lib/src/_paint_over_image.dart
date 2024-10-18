@@ -839,7 +839,10 @@ class ImagePainterState extends State<ImagePainter> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
-            children: [widget.leadingWidget ?? const SizedBox()],
+            children: [
+              widget.leadingWidget ?? const SizedBox(),
+              Text(widget.title ?? '')
+            ],
           ),
 
           Row(
